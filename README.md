@@ -2,7 +2,7 @@
 
 ![Glass Notes Homepage](Assets/screenshots/homepage.png)
 
-Glass Notes is a modern, lightweight, **open-source** note-taking application for Windows 10/11 that features a beautiful **transparent overlay**. If you are looking for a transparent notes app, a minimalist sticky notes alternative, or an "always on top" desktop widget for productivity, Glass Notes is designed perfectly for your workflow!
+Glass Notes (GlassNotes) is a lightweight, **open-source desktop notes app for Windows 10/11**. It keeps notes in a customizable transparent window and combines free-form notes with an interactive to-do list. Glass Notes is built with WPF and .NET 10.
 
 ### Download
 
@@ -18,6 +18,10 @@ Glass Notes is a modern, lightweight, **open-source** note-taking application fo
 - **Hide Notes** - Quickly toggle the visibility of all your notes to declutter your workspace
 - **Multiple Notes** - Create and manage multiple notes with quick switching
   ![Multiple Tabs Example](Assets/screenshots/open_multiple_tabs.png)
+- **Interactive To-Do Lists** - Press Enter to add a bulleted item; complete, pin, or delete items; completed items move to the bottom with strikethrough
+- **Keyboard Editing** - Press Backspace on an empty to-do item to remove it
+- **Custom Typography** - Choose the font family and size for notes and to-do items
+- **Launch at Sign-In** - Optionally start Glass Notes when you sign in to Windows
 - **Auto-Save** - Your notes are automatically saved every 3 seconds
 - **Clean, Modern Interface** - Built with Windows Fluent Design principles
 - **Lightweight & Fast** - Minimal resource usage, instant startup
@@ -26,7 +30,8 @@ Glass Notes is a modern, lightweight, **open-source** note-taking application fo
 ## Requirements
 
 - Windows 10 (version 1809 or later) or Windows 11
-- .NET 10.0 Runtime
+- To build from source: .NET 10.0 SDK
+- The self-contained Windows x64 publish does not require a separate .NET runtime installation
 
 ## Building from Source
 
@@ -58,7 +63,18 @@ Or build a release version:
 dotnet build --configuration Release
 ```
 
-The executable will be in: `bin\Release\net10.0-windows\GlassNotes.exe`
+The executable will be in: `bin\Release\net10.0-windows\GlassNotes.exe`.
+
+To create a self-contained single-file Windows x64 executable:
+
+```powershell
+dotnet publish .\GlassNotes.csproj -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=true -p:PublishReadyToRun=true `
+  -p:IncludeNativeLibrariesForSelfExtract=true `
+  -p:DebugType=None -p:DebugSymbols=false -o .\publish-single-exe
+```
+
+The output folder contains a single `GlassNotes.exe` that can run on compatible Windows x64 computers without installing the .NET runtime.
 
 ## Usage
 
@@ -68,16 +84,20 @@ The executable will be in: `bin\Release\net10.0-windows\GlassNotes.exe`
 - **Hide/Show Notes** by clicking the eye icon or pressing `Ctrl + Shift + Z`
 - **Click the gear icon** to open settings
 - **Click New** to create a new note
-- **Click Delete** to delete the current note
-- **Type directly** in the text area - changes auto-save
+- **Add to-dos** with the plus button in the bottom toolbar, or press Enter at the end of a to-do
+- **Complete, pin, or delete a to-do** using the actions shown when hovering over its row
+- **Press Backspace** in an empty to-do row to remove it
+- **Type directly** in the note or to-do area - changes auto-save
 
 ### Settings
 
 ![Settings Menu](Assets/screenshots/settings.png)
 - **Opacity**: Adjust window transparency (10%-100%)
 - **Font Size**: Change text size (10-24pt)
+- **Font Family**: Choose the typeface for note and to-do text
 - **Theme**: Switch between Light and Dark modes
 - **Always on Top**: Toggle whether window stays above other windows
+- **Launch at Sign-In**: Start the app automatically for the current Windows user
 
 ## Data Storage
 

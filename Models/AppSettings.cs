@@ -35,6 +35,9 @@ public partial class AppSettings : ObservableObject
     [ObservableProperty]
     private bool _alwaysOnTop = true;
 
+    [ObservableProperty]
+    private bool _launchAtStartup;
+
     public double WindowWidth { get; set; } = 680;
     public double WindowHeight { get; set; } = 520;
     public double WindowLeft { get; set; } = 100;

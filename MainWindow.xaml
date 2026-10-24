@@ -44,7 +44,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- ── Title Bar ─────────────────────────────────────────────── -->
-                <Border Grid.Row="0"
+                <Border x:Name="TitleBar" Grid.Row="0"
                         Background="{DynamicResource SurfaceBrush}"
                         CornerRadius="16,16,0,0"
                         MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
@@ -105,14 +105,14 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Text="NOTES"
+                            <TextBlock Grid.Row="0" Text="NOTES"
                                        FontWeight="SemiBold" FontSize="10"
                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                        Margin="14,10,14,4"/>
 
                             <!-- Search Box -->
-                            <Grid Grid.Row="0" Margin="10,0,10,8">
-                                <Border Background="{DynamicResource SurfaceBrush}"
+                            <Grid Grid.Row="0" Margin="10,26,10,8">
+                                <Border Background="#66FFFFFF"
                                         CornerRadius="8"
                                         BorderBrush="{DynamicResource BorderBrush}"
                                         BorderThickness="1"
@@ -190,7 +190,7 @@
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Border x:Name="NoteItemBorder"
-                                                Background="{DynamicResource NoteItemBackgroundBrush}"
+                                                Background="#55FFFFFF"
                                                 Padding="10,8" Margin="2,2"
                                                 CornerRadius="8"
                                                 BorderThickness="1.5"
@@ -235,7 +235,7 @@
                                         <DataTemplate.Triggers>
                                             <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
                                                 <Setter TargetName="NoteItemBorder" Property="BorderBrush" Value="#E2E2E2"/>
-                                                <Setter TargetName="NoteItemBorder" Property="Background" Value="White"/>
+                                                <Setter TargetName="NoteItemBorder" Property="Background" Value="#88FFFFFF"/>
                                                 <Setter TargetName="TitleText" Property="Foreground" Value="#1A1A1A"/>
                                                 <Setter TargetName="DateText" Property="Foreground" Value="#666666"/>
                                             </DataTrigger>
@@ -248,39 +248,51 @@
 
                     <!-- Note Content Area -->
                     <Grid Grid.Column="1" Margin="8" ClipToBounds="True">
-                        <TextBox x:Name="NoteTextBox"
-                                 Text="{Binding CurrentNote.Content, UpdateSourceTrigger=PropertyChanged}"
-                                 GlassHelpers:SearchHighlightBehavior.SearchText="{Binding SearchText}"
-                                 AcceptsReturn="True" TextWrapping="Wrap"
-                                 BorderThickness="0" Background="Transparent"
-                                 Foreground="{DynamicResource TextPrimaryBrush}"
-                                 FontSize="{Binding Settings.FontSize}"
-                                 FontFamily="{Binding Settings.FontFamily}"
-                                 VerticalScrollBarVisibility="Auto"
-                                 Padding="8"/>
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                        <TextBox x:Name="NoteTitleTextBox"
+                                 Text="{Binding CurrentNote.Title, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="#55FFFFFF" BorderThickness="0,0,0,1" BorderBrush="#88FFFFFF"
+                                 FontSize="22" FontWeight="SemiBold" Padding="8,4" Margin="8,4,8,10"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="TodoList" Margin="8"/>
+                        </ScrollViewer>
                     </Grid>
                 </Grid>
 
                 <!-- ── Bottom Toolbar ────────────────────────────────────────── -->
-                <Border Grid.Row="2"
+                <Border x:Name="BottomToolbar" Grid.Row="2"
                         Background="{DynamicResource SurfaceBrush}"
                         CornerRadius="0,0,16,16"
                         Height="46">
-                    <StackPanel Orientation="Horizontal" Margin="8,0"
-                                HorizontalAlignment="Left" VerticalAlignment="Center">
-                        <Button Content="➕" Style="{StaticResource IconButton}"
-                                Command="{Binding CreateNewNoteCommand}"
-                                ToolTip="New Note" FontSize="16"
-                                Width="36" Height="36" Margin="2,0"/>
-                        <Button Content="⚙️" Style="{StaticResource IconButton}"
-                                Click="SettingsButton_Click"
-                                ToolTip="Settings" FontSize="16"
-                                Width="36" Height="36" Margin="2,0"/>
-                        <Button Content="👁️" Style="{StaticResource IconButton}"
-                                Command="{Binding ToggleAllNotesVisibilityCommand}"
-                                ToolTip="Hide/Unhide all notes (Ctrl + Shift + Z)" FontSize="16"
-                                Width="36" Height="36" Margin="2,0"/>
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200" MinWidth="160" MaxWidth="280"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="8,0"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <Button Content="＋" Style="{StaticResource IconButton}"
+                                    Command="{Binding CreateNewNoteCommand}"
+                                    ToolTip="New Note" FontSize="16"
+                                    Width="36" Height="36" Margin="2,0"/>
+                            <Button Content="⚙️" Style="{StaticResource IconButton}"
+                                    Click="SettingsButton_Click"
+                                    ToolTip="Settings" FontSize="16"
+                                    Width="36" Height="36" Margin="2,0"/>
+                            <Button Content="👁️" Style="{StaticResource IconButton}"
+                                    Command="{Binding ToggleAllNotesVisibilityCommand}"
+                                    ToolTip="Hide/Unhide all notes (Ctrl + Shift + Z)" FontSize="16"
+                                    Width="36" Height="36" Margin="2,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <Button Content="＋" Style="{StaticResource IconButton}"
+                                    Click="AddTodoButton_Click"
+                                    ToolTip="Add todo" FontSize="16"
+                                    Width="36" Height="36" Margin="2,0"/>
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </Grid>
         </Border>
@@ -444,7 +456,9 @@
                                 <TextBlock Text="Transparency:" FontWeight="SemiBold" FontSize="13" Foreground="#1A1A1A" Margin="0,0,0,8"/>
                                 <Slider x:Name="SO_TransparencySlider" Minimum="0.1" Maximum="1.0" Value="1.0" SmallChange="0.05" LargeChange="0.1"/>
                                 <TextBlock x:Name="SO_TransparencyLabel" Text="100%" FontSize="12" Foreground="#666666" Margin="0,4,0,12"/>
-                                <CheckBox x:Name="SO_AlwaysOnTopCheckBox" Content="Always on top" FontSize="13" Foreground="#1A1A1A"/>
+                                <CheckBox x:Name="SO_AlwaysOnTopCheckBox" Content="Always on top" FontSize="13" Foreground="#1A1A1A" Margin="0,0,0,8"/>
+                                <CheckBox x:Name="SO_LaunchAtStartupCheckBox" Content="Launch Glass Notes when I sign in" FontSize="13" Foreground="#1A1A1A"/>
+                                <CheckBox x:Name="SO_TransparentBarsCheckBox" Content="Transparent title and toolbar" FontSize="13" Foreground="#1A1A1A" Margin="0,8,0,0"/>
                             </StackPanel>
 
                             <StackPanel x:Name="SO_PanelColors" Visibility="Collapsed">

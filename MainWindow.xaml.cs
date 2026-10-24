@@ -1,8 +1,10 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using GlassNotes.Helpers;
+using GlassNotes.Services;
 using GlassNotes.ViewModels;
 
 namespace GlassNotes;
@@ -14,10 +16,15 @@ public partial class MainWindow : Window
 {
     private const int HOTKEY_ID = 9000;
     private MainViewModel ViewModel => (MainViewModel)DataContext;
+    private readonly StartupSettingController _startupSettings;
+    private bool _isSynchronizingStartupCheckbox;
 
     public MainWindow()
     {
         DataContext = new MainViewModel();
+        _startupSettings = new StartupSettingController(
+            new StartupService("GlassNotes", GetExecutablePath()),
+            ViewModel.Settings);
         InitializeComponent();
 
         // Load saved window position and size
@@ -284,6 +291,7 @@ public partial class MainWindow : Window
         SO_TransparencySlider.SetCurrentValue(System.Windows.Controls.Primitives.RangeBase.ValueProperty, ViewModel.Settings.Opacity);
         SO_TransparencyLabel.SetCurrentValue(TextBlock.TextProperty, $"{(int)(ViewModel.Settings.Opacity * 100)}%");
         SO_AlwaysOnTopCheckBox.SetCurrentValue(System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, ViewModel.Settings.AlwaysOnTop);
+        LoadStartupSetting();
         SO_FontSizeSlider.SetCurrentValue(System.Windows.Controls.Primitives.RangeBase.ValueProperty, ViewModel.Settings.FontSize);
         SO_FontSizeLabel.SetCurrentValue(TextBlock.TextProperty, $"{(int)ViewModel.Settings.FontSize}px");
         SelectComboByTag(SO_BackgroundColorComboBox, ViewModel.Settings.BackgroundColor);
@@ -309,6 +317,8 @@ public partial class MainWindow : Window
 
         SO_AlwaysOnTopCheckBox.Checked += (s, e) => { SetCurrentValue(TopmostProperty, true); ViewModel.Settings.AlwaysOnTop = true; ViewModel.SaveSettings(); };
         SO_AlwaysOnTopCheckBox.Unchecked += (s, e) => { SetCurrentValue(TopmostProperty, false); ViewModel.Settings.AlwaysOnTop = false; ViewModel.SaveSettings(); };
+        SO_LaunchAtStartupCheckBox.Checked += (s, e) => SetLaunchAtStartup(true);
+        SO_LaunchAtStartupCheckBox.Unchecked += (s, e) => SetLaunchAtStartup(false);
 
         SO_FontSizeSlider.ValueChanged += (s, e) =>
         {
@@ -348,6 +358,50 @@ public partial class MainWindow : Window
             }
         };
     }
+
+    private static string GetExecutablePath() =>
+        Environment.ProcessPath ?? Path.Combine(AppContext.BaseDirectory, "GlassNotes.exe");
+
+    private void LoadStartupSetting()
+    {
+        var result = _startupSettings.ReadLaunchAtStartup();
+        SetStartupCheckbox(result.LaunchAtStartup);
+
+        if (result.Succeeded)
+            ViewModel.SaveSettings();
+        else
+            ShowStartupRegistryError("read", result.Error!);
+    }
+
+    private void SetLaunchAtStartup(bool enabled)
+    {
+        if (_isSynchronizingStartupCheckbox)
+            return;
+
+        var result = _startupSettings.SetLaunchAtStartup(enabled);
+        SetStartupCheckbox(result.LaunchAtStartup);
+
+        if (result.Succeeded)
+            ViewModel.SaveSettings();
+        else
+            ShowStartupRegistryError("update", result.Error!);
+    }
+
+    private void SetStartupCheckbox(bool isChecked)
+    {
+        _isSynchronizingStartupCheckbox = true;
+        SO_LaunchAtStartupCheckBox.SetCurrentValue(
+            System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+            isChecked);
+        _isSynchronizingStartupCheckbox = false;
+    }
+
+    private static void ShowStartupRegistryError(string operation, Exception ex) =>
+        MessageBox.Show(
+            $"Glass Notes could not {operation} the Windows startup setting. The saved preference was left unchanged.\n\n{ex.Message}",
+            "Startup setting unavailable",
+            MessageBoxButton.OK,
+            MessageBoxImage.Warning);
 
     public void UpdateOpacity(double opacity)
     {

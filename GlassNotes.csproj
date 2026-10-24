@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\icon.ico" />
+    <Compile Remove="GlassNotes.Tests\**\*.cs" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="WpfAnalyzers" Version="4.1.1">

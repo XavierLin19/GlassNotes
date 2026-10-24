@@ -15,6 +15,8 @@ public partial class Note : ObservableObject
     [ObservableProperty]
     private string _content = string.Empty;
 
+    public List<NoteBlock> Blocks { get; set; } = new();
+
     public DateTime CreatedAt { get; set; }
     public DateTime ModifiedAt { get; set; }
 

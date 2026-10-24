@@ -17,4 +17,5 @@
     <Platform Solution="Release|ARM64" Project="ARM64" />
     <Platform Solution="Release|x64" Project="x64" />
   </Project>
+  <Project Path="GlassNotes.Tests/GlassNotes.Tests.csproj" />
 </Solution>
